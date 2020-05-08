@@ -1,3 +1,4 @@
+# vim: set ft=sh:
 #
 # Originally derived from https://github.com/kisslinux/init
 # Modified and extended by illiliti
