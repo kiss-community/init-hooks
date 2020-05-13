@@ -11,12 +11,13 @@ log "Deactivating LVM devices (if any exist)..."; {
 log "Deactivating dm-crypt devices (if any exist)..."; {
     [ -x /bin/cryptsetup ] && {
         for file in /sys/block/*/dm/uuid; do
-            while read -r uuid; do
-                [ -e "/dev/mapper/${uuid#CRYPT-*-*-}" ] ||
-                    continue
 
-                cryptsetup close --deferred "${uuid#CRYPT-*-*-}"
-            done < "$file"
+            # CRYPT-LUKS2-6ebc0f95ff2344208ce4977bd3eb296e-enc
+            # $TYPE-$CRYPT_TYPE-$UUID-$DM_NAME
+            IFS=- read -r dm_type _ _ dm_name < "$file"
+
+            # --deferred flag used to prevent hang on FDE systems
+            [ "$dm_type" = CRYPT ] && cryptsetup close --deferred "$dm_name"
         done
 
         log "Deactivating LVM devices for dm-crypt (if any exist)..."; {
