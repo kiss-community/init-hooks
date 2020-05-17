@@ -5,11 +5,11 @@
 #
 
 log "Deactivating LVM devices (if any exist)..."; {
-    [ -x /bin/lvm ] && lvm vgchange -an
+    command -v lvm > /dev/null && lvm vgchange --sysinit -an
 }
 
 log "Deactivating dm-crypt devices (if any exist)..."; {
-    [ -x /bin/cryptsetup ] && {
+    command -v cryptsetup > /dev/null && {
         for file in /sys/block/*/dm/uuid; do
 
             # CRYPT-LUKS2-6ebc0f95ff2344208ce4977bd3eb296e-enc
@@ -21,7 +21,7 @@ log "Deactivating dm-crypt devices (if any exist)..."; {
         done
 
         log "Deactivating LVM devices for dm-crypt (if any exist)..."; {
-            [ -x /bin/lvm ] && lvm vgchange -an
+            command -v lvm > /dev/null && lvm vgchange --sysinit -an
         }
     }
 }

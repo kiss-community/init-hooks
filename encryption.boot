@@ -7,11 +7,11 @@
 mkdir -p /run/lvm /run/cryptsetup
 
 log "Activating LVM devices (if any exist)..."; {
-    [ -x /bin/lvm ] && lvm vgchange --sysinit -aay
+    command -v lvm > /dev/null && lvm vgchange --sysinit -aay
 }
 
 log "Activating dm-crypt devices (if any exist)..."; {
-    [ -e /etc/crypttab ] && [ -x /bin/cryptsetup ] &&
+    command -v cryptsetup > /dev/null && [ -e /etc/crypttab ] &&
         exec 3<&0
 
         # shellcheck disable=2086
@@ -78,6 +78,6 @@ log "Activating dm-crypt devices (if any exist)..."; {
         exec 3>&-
 
         log "Activating LVM devices for dm-crypt (if any exist)..."; {
-            [ -x /bin/lvm ] && lvm vgchange --sysinit -aay
+            command -v lvm > /dev/null && lvm vgchange --sysinit -aay
         }
 }
