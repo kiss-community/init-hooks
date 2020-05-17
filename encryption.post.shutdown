@@ -4,24 +4,27 @@
 # Modified and extended by illiliti
 #
 
-log "Deactivating LVM devices (if any exist)..."; {
-    command -v lvm > /dev/null && lvm vgchange --sysinit -an
+command -v lvm > /dev/null && {
+    log "Deactivating LVM devices (if any exist)..."
+    lvm vgchange --sysinit -an
 }
 
-log "Deactivating dm-crypt devices (if any exist)..."; {
-    command -v cryptsetup > /dev/null && {
-        for file in /sys/block/*/dm/uuid; do
+command -v cryptsetup > /dev/null && {
+    log "Deactivating LUKS devices (if any exist)..."
 
-            # CRYPT-LUKS2-6ebc0f95ff2344208ce4977bd3eb296e-enc
-            # $TYPE-$CRYPT_TYPE-$UUID-$DM_NAME
-            IFS=- read -r dm_type _ _ dm_name < "$file"
+    for file in /sys/block/*/dm/uuid; do
 
-            # --deferred flag used to prevent hang on FDE systems
-            [ "$dm_type" = CRYPT ] && cryptsetup close --deferred "$dm_name"
-        done
+        # format
+        # CRYPT-LUKS2-6ebc0f95ff2344208ce4977bd3eb296e-enc
+        # $TYPE-$CRYPT_TYPE-$UUID-$DM_NAME
+        IFS=- read -r dm_type _ _ dm_name < "$file"
 
-        log "Deactivating LVM devices for dm-crypt (if any exist)..."; {
-            command -v lvm > /dev/null && lvm vgchange --sysinit -an
-        }
+        # --deferred used to prevent hang on FDE systems
+        [ "$dm_type" = CRYPT ] && cryptsetup close --deferred "$dm_name"
+    done
+
+    command -v lvm > /dev/null && {
+        log "Deactivating LVM devices for LUKS (if any exist)..."
+        lvm vgchange --sysinit -an
     }
 }
