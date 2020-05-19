@@ -8,7 +8,7 @@
 set -f
 
 # supress error output due to sbase mkdir
-# complain about existence directories
+# complain about exist directories
 mkdir -p /run/lvm /run/cryptsetup 2> /dev/null
 
 command -v lvm > /dev/null && {
@@ -21,7 +21,7 @@ command -v cryptsetup > /dev/null && test -f /etc/crypttab && {
 
     exec 3<&0; while read -r name dev pass opts err; do
 
-        # Break on invalid crypttab (> 5 columns).
+        # Break on invalid crypttab.
         [ "$err" ] && {
             log "A valid /etc/crypttab has only 4 columns. Aborting..."
             break
@@ -30,19 +30,19 @@ command -v cryptsetup > /dev/null && test -f /etc/crypttab && {
         # Skip comments.
         [ "${name##\#*}" ] || continue
 
-        # Turn 'UUID=*', 'LABEL=*', 'PARTUUID=*' lines into device names.
-        case ${dev%%=*} in UUID|LABEL|PARTUUID)
-            for line in $(blkid); do case ${line%%=*} in
+        # Turn 'UUID=*', 'LABEL=*', 'PARTUUID=*' into device name.
+        case "${dev%%=*}" in UUID|LABEL|PARTUUID)
+            for line in $(blkid); do case "${line%%=*}" in
                 /dev/*)
-                    _dev=${line%:}
+                    _dev="${line%:}"
                 ;;
                 UUID|LABEL|PARTUUID)
-                    _line=${line##*=}
-                    _line=${_line%\"}
-                    _line=${_line#\"}
+                    _line="${line##*=}"
+                    _line="${_line%\"}"
+                    _line="${_line#\"}"
 
                     [ "$_line" = "${dev##*=}" ] && {
-                        dev=$_dev
+                        dev="$_dev"
                         break
                     }
                 ;;
@@ -50,7 +50,7 @@ command -v cryptsetup > /dev/null && test -f /etc/crypttab && {
         esac
 
         # Sanity check.
-        [ "${dev##/dev/*}" ] && {
+        [ "${dev#/dev/*}" ] && {
             log "Failed to resolve $dev. Aborting..."
             continue
         }
