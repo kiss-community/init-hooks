@@ -21,14 +21,14 @@ command -v cryptsetup > /dev/null && test -f /etc/crypttab && {
 
     exec 3<&0; while read -r name dev pass opts err; do
 
+        # Skip comments.
+        [ "${name##\#*}" ] || continue
+
         # Break on invalid crypttab.
         [ "$err" ] && {
             log "A valid /etc/crypttab has only 4 columns. Aborting..."
             break
         }
-
-        # Skip comments.
-        [ "${name##\#*}" ] || continue
 
         # Turn 'UUID=*', 'LABEL=*', 'PARTUUID=*' into device name.
         case "${dev%%=*}" in UUID|LABEL|PARTUUID)
