@@ -79,6 +79,7 @@ command -v cryptsetup > /dev/null && test -f /etc/crypttab && {
     command -v lvm > /dev/null && {
         log "Activating LVM devices for LUKS (if any exist)..."
         lvm vgchange --sysinit -aay
+        lvmvgscan --mknodes
     }
 }
 
