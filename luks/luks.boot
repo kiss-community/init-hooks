@@ -1,24 +1,11 @@
-# vim: set ft=sh:
+#!/bin/sh
 #
-# Originally derived from https://github.com/kisslinux/init
-# Modified and extended by illiliti
-#
-
-# disable globbing because we don't need it
-set -f
-
-# supress error output due to sbase mkdir
-# complain about exist directories
-mkdir -p /run/lvm /run/cryptsetup 2> /dev/null
-
-command -v lvm > /dev/null && {
-    log "Activating LVM devices (if any exist)..."
-    lvm vgchange --sysinit -aay
-}
+# Derived from https://github.com/kisslinux/init
 
 command -v cryptsetup > /dev/null && test -f /etc/crypttab && {
     log "Activating LUKS devices (if any exist)..."
 
+    mkdir -p /run/cryptsetup 2> /dev/null
     exec 3<&0; while read -r name dev pass opts err; do
 
         # Skip comments.
@@ -75,12 +62,4 @@ command -v cryptsetup > /dev/null && test -f /etc/crypttab && {
             *) cryptsetup open $copts -d "$pass" "$dev" "$name"  ;;
         esac
     copts=; done < /etc/crypttab; exec 3>&-
-
-    command -v lvm > /dev/null && {
-        log "Activating LVM devices for LUKS (if any exist)..."
-        lvm vgchange --sysinit -aay
-    }
 }
-
-# restore globbing
-set +f

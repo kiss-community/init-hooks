@@ -1,0 +1,19 @@
+#!/bin/sh
+#
+# Derived from https://github.com/kisslinux/init
+
+command -v cryptsetup > /dev/null && {
+    log "Deactivating LUKS devices (if any exist)..."
+
+    for file in /sys/block/*/dm/uuid; do
+
+        # format
+        # $TYPE-$CRYPT_TYPE-$UUID-$DM_NAME
+        # example
+        # CRYPT-LUKS2-6ebc0f95ff2344208ce4977bd3eb296e-enc
+        IFS=- read -r dm_type _ _ dm_name < "$file"
+
+        # Use --deferred to prevent hang if / is encrypted
+        [ "$dm_type" = CRYPT ] && cryptsetup close --deferred "$dm_name"
+    done
+}

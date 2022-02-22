@@ -1,0 +1,8 @@
+#!/bin/sh
+#
+# Derived from https://github.com/kisslinux/init
+
+command -v lvm > /dev/null && {
+    log "Deactivating LVM devices (if any exist)..."
+    lvm vgchange --sysinit -an
+}
