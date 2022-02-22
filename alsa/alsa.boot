@@ -1,3 +1,3 @@
 #!/bin/sh
 
-alsactl restore
+command -v alsactl > /dev/null && alsactl restore
