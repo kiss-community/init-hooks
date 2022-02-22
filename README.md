@@ -1,10 +1,8 @@
-kiss-encryption
-===============
+# init-hooks
 
-* LUKS and LVM support for KISS init
+Collection of hooks for kiss init
 
-Installation
-------------
+## Installation
 
 ```
 make install
