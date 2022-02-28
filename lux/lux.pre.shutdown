@@ -1,0 +1,7 @@
+#!/bin/sh
+
+command -v lux > /dev/null && {
+    log "Saving brightness level..."
+    mkdir -p /var/lib/lux
+    level=$(lux -G) && printf '%s\n' "$level" > /var/lib/lux/lux.level
+}
